@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sarkari Form Assistant - Enhanced Dashboard</title>
+  
+  <!-- Load Tailwind CSS for modern styling and responsiveness (REQUIRED FOR MODAL) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  
+  <!-- Custom Styles for Chatbot Widget and Gemini Modal -->
+  <style>
+    /* Styles needed for the modal from ai_assistant.html */
+    #result-area::-webkit-scrollbar {
+        width: 8px;
+    }
+    #result-area::-webkit-scrollbar-thumb {
+        background-color: #30363d;
+        border-radius: 10px;
+    }
+    .modal-container {
+        transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+    }
+    .citation-link {
+        transition: background-color 0.1s;
+    }
+    .citation-link:hover {
+        background-color: #30363d;
+    }
+    
+    /* Custom style for the fixed chatbot widget */
+    .chatbot-widget {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        background: #0077b6; /* Blue to stand out */
+        color: white;
+        padding: 10px 15px;
+        border-radius: 30px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        cursor: pointer;
+        transition: background-color 0.2s, transform 0.1s;
+    }
+    .chatbot-widget:hover {
+        background: #00509d;
+        transform: scale(1.05);
+    }
+    .chat-icon {
+        font-size: 1.5rem;
+        margin-right: 10px;
+    }
+    .chat-text p {
+        font-size: 0.85rem;
+        line-height: 1.2;
+        margin: 0;
+    }
+
+    /* Navbar styling */
+    .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 2rem;
+        background-color: #1f2937; /* Dark background */
+        color: white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .logo-container {
+        display: flex;
+        align-items: center;
+    }
+    .logo-icon {
+        margin-right: 8px;
+    }
+    .logo-text {
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+    .nav-links {
+        display: flex;
+        gap: 20px;
+    }
+    .nav-links a {
+        color: #9ca3af;
+        transition: color 0.2s;
+    }
+    .nav-links a:hover {
+        color: #ffffff;
+    }
+    .nav-actions {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    .icon-btn {
+        color: white;
+        font-size: 1.1rem;
+    }
+    .login-btn {
+        background-color: #0077b6;
+        padding: 6px 15px;
+        border-radius: 20px;
+        font-weight: 500;
+        transition: background-color 0.2s;
+    }
+    .login-btn:hover {
+        background-color: #00509d;
+    }
+    /* Main Dashboard Layout */
+    .dashboard-container {
+        padding: 20px;
+        background-color: #f3f4f6;
+    }
+    .hero-section {
+        background-color: #0077b6;
+        color: white;
+        padding: 40px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+    .hero-section h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+    .search-box {
+        display: flex;
+        max-width: 600px;
+        margin: 0 auto 15px;
+        background-color: white;
+        border-radius: 8px;
+        padding: 5px;
+        align-items: center;
+    }
+    .search-box input {
+        flex-grow: 1;
+        padding: 10px;
+        border: none;
+        outline: none;
+        color: #374151;
+    }
+    .search-icon {
+        color: #9ca3af;
+        margin-left: 10px;
+    }
+    .explore-btn {
+        background-color: #00b4d8;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        transition: background-color 0.2s;
+    }
+    .explore-btn:hover {
+        background-color: #00a4c8;
+    }
+    .update-text {
+        font-size: 0.9rem;
+        font-weight: 500;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+    }
+    .main-content-grid {
+        display: grid;
+        grid-template-columns: 3fr 1fr;
+        gap: 30px;
+    }
+    .section {
+        background-color: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+    .section h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 15px;
+        border-bottom: 2px solid #e5e7eb;
+        padding-bottom: 10px;
+        color: #1f2937;
+    }
+    /* Upcoming Exams Section */
+    .exam-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+    }
+    .exam-card {
+        padding: 15px;
+        border-radius: 8px;
+        color: white;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .exam-card h3 {
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+    .exam-card p {
+        font-size: 0.85rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .civil-services { background-color: #4f46e5; }
+    .ssc-cgl { background-color: #059669; }
+    .ibps-po { background-color: #f59e0b; }
+    .tag {
+        font-size: 0.7rem;
+        padding: 3px 8px;
+        border-radius: 10px;
+        font-weight: 500;
+    }
+    .green { background-color: #10b981; }
+    .bright-green { background-color: #34d399; }
+    .orange { background-color: #f97316; }
+    .small-tag { padding: 2px 6px; margin-left: 5px;}
+    .green-tag { background-color: #065f46; }
+
+    /* AI Tools Section */
+    .ai-grid {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 20px;
+        align-items: stretch;
+    }
+    .upload-box {
+        background-color: #eef2ff;
+        border: 2px dashed #a5b4fc;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        align-items: center;
+    }
+    .upload-icon {
+        font-size: 2.5rem;
+        color: #4f46e5;
+        margin-bottom: 10px;
+    }
+    .upload-text {
+        font-weight: 500;
+        color: #374151;
+    }
+    .upload-options {
+        margin: 10px 0;
+        font-size: 0.8rem;
+        color: #6b7280;
+    }
+    .apply-now-btn {
+        background-color: #10b981;
+        color: white;
+        padding: 8px 15px;
+        border-radius: 6px;
+        font-weight: 500;
+        transition: background-color 0.2s;
+    }
+    .apply-now-btn:hover {
+        background-color: #059669;
+    }
+    .ai-tool-card {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        background-color: #f7f7f7;
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+    }
+    .image-placeholder {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.5rem;
+        color: white;
+    }
+    .gemini-placeholder {
+        background-color: #2563eb;
+    }
+    .ai-tool-card h3 {
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: #1f2937;
+    }
+    .tool-desc {
+        font-size: 0.9rem;
+        color: #4b5563;
+        margin-bottom: 8px;
+    }
+    .tool-time {
+        font-size: 0.75rem;
+        color: #9ca3af;
+        margin-bottom: 10px;
+    }
+    .gemini-action-btn {
+        background-color: #ef4444;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-weight: 500;
+        transition: background-color 0.2s;
+    }
+    .gemini-action-btn:hover {
+        background-color: #dc2626;
+    }
+    
+    /* Applications Section */
+    .applications-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+    }
+    .app-card {
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+        background-color: #f9fafb;
+        display: flex;
+        flex-direction: column;
+    }
+    .app-card h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 5px;
+    }
+    .card-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    .card-icon {
+        color: #0077b6;
+        margin-right: 10px;
+        font-size: 1.2rem;
+    }
+    .app-details p {
+        font-size: 0.85rem;
+        color: #4b5563;
+        margin-bottom: 4px;
+    }
+    .app-details strong {
+        color: #ef4444;
+        font-weight: 600;
+    }
+    .app-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: auto;
+        padding-top: 10px;
+        border-top: 1px dashed #e5e7eb;
+    }
+    .syllabus-link, .status-link {
+        font-size: 0.85rem;
+        color: #2563eb;
+        font-weight: 500;
+    }
+    .save-btn, .apply-btn {
+        background-color: #34d399;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        transition: background-color 0.2s;
+    }
+    .apply-btn {
+        background-color: #0077b6;
+    }
+    .save-btn:hover { background-color: #10b981; }
+    .apply-btn:hover { background-color: #00509d; }
+
+    /* Small Card variations */
+    .small-card {
+        text-align: center;
+        justify-content: center;
+        align-items: center;
+        min-height: 120px;
+    }
+    .small-card p {
+        font-size: 1rem;
+        margin: 5px 0;
+    }
+    .submitted-status, .saved-status, .save-dark, .apply-dark {
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        color: white;
+    }
+    .submitted-status { background-color: #10b981; }
+    .saved-status { background-color: #6366f1; }
+    .save-dark { background-color: #4b5563; }
+    .apply-dark { background-color: #00509d; }
+    .form-submitted, .date-applied, .form-sappled, .form-submitted-final {
+        background-color: #f0fdf4;
+        border: 1px solid #dcfce7;
+    }
+
+    /* Resources Section */
+    .resources-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .resources-links a {
+        background-color: #f3f4f6;
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        color: #4b5563;
+        transition: background-color 0.2s, color 0.2s;
+    }
+    .resources-links a:hover {
+        background-color: #e5e7eb;
+        color: #1f2937;
+    }
+    
+    /* Documents Manager (Right Column) */
+    .documents-manager-section {
+        /* This column is often for static info, smaller. */
+    }
+    .tool-cards-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    .tool-card-box {
+        background-color: #f9fafb;
+        padding: 10px;
+        border-radius: 8px;
+        text-align: center;
+        border: 1px solid #e5e7eb;
+    }
+    .tool-card-box h3 {
+        font-size: 0.85rem;
+        font-weight: 500;
+        margin-top: 5px;
+    }
+    .card-icon {
+        font-size: 1.5rem;
+        padding: 8px;
+        border-radius: 50%;
+        color: white;
+    }
+    .blue-bg { background-color: #2563eb; }
+    .orange-bg { background-color: #f97316; }
+    .red-bg { background-color: #ef4444; }
+
+    .tool-details-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    .detail-box {
+        background-color: #eff6ff;
+        border: 1px solid #bfdbfe;
+        padding: 10px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        color: #1e40af;
+    }
+    .detail-box p { margin-bottom: 3px; }
+    .time-stamp {
+        font-size: 0.7rem;
+        color: #60a5fa;
+    }
+
+    .required-docs {
+        border-top: 2px solid #e5e7eb;
+        padding-top: 15px;
+    }
+    .required-docs h3 {
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: #1f2937;
+    }
+    .doc-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+    }
+    .doc-item p {
+        font-size: 0.9rem;
+        color: #374151;
+    }
+    .doc-size {
+        font-size: 0.75rem;
+        color: #9ca3af;
+    }
+    .doc-status-indicators {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+    .status-legend {
+        display: flex;
+        align-items: center;
+        font-size: 0.8rem;
+        color: #4b5563;
+    }
+    .legend-dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 5px;
+    }
+    .legend-dot.green { background-color: #10b981; }
+    .legend-dot.blue { background-color: #2563eb; }
+    .legend-dot.red { background-color: #ef4444; }
+
+    /* Footer */
+    .footer-section {
+        background-color: #1f2937;
+        color: white;
+        padding: 20px;
+        text-align: center;
+    }
+    .socials a {
+        color: #9ca3af;
+        font-size: 1.2rem;
+        margin: 0 10px;
+        transition: color 0.2s;
+    }
+    .socials a:hover {
+        color: white;
+    }
+    .download-app-btn {
+        background-color: #0077b6;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        margin-left: 20px;
+    }
+
+    /* Responsiveness */
+    @media (max-width: 1024px) {
+        .main-content-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    @media (max-width: 768px) {
+        .navbar {
+            flex-direction: column;
+            gap: 15px;
+        }
+        .nav-links {
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .hero-section {
+            padding: 30px 15px;
+        }
+        .hero-section h1 {
+            font-size: 1.8rem;
+        }
+        .search-box {
+            flex-direction: column;
+            padding: 10px;
+        }
+        .search-box input {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .ai-grid {
+            grid-template-columns: 1fr;
+        }
+        .tool-cards-grid {
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        }
+    }
+
+  </style>
+  
+</head>
+<body>
+  
+  <header class="navbar">
+    <div class="logo-container">
+      <svg class="logo-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8zm-1-12h2v6h-2z" fill="#00509d"/>
+        <path d="M11 12h2v2h-2zm0-4h2v2h-2z" fill="#00b4d8"/>
+      </svg>
+      <span class="logo-text">Sarkari Form Assistant</span>
+    </div>
+    <nav>
+      <ul class="nav-links">
+        <li><a href="#">Home</a></li>
+        <li><a href="#">Jobs</a></li>
+        <li><a href="#">Form Assistant</a></li>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Syllabus</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </nav>
+    <div class="nav-actions">
+      <a href="#" class="icon-btn"><i class="fas fa-bell"></i></a>
+      <a href="#" class="icon-btn"><i class="fas fa-sun"></i></a>
+      <a href="#" class="login-btn">Log/Hi!</a>
+    </div>
+  </header>
+
+  <main class="dashboard-container">
+    <section class="hero-section">
+      <div class="hero-content">
+        <h1>Your Gateway to Government Jobs</h1>
+        <div class="search-box">
+          <i class="fas fa-search search-icon"></i>
+          <input type="text" placeholder="Search by Job Title, Department, or Exam">
+          <button class="explore-btn">Explore Jobs</button>
+        </div>
+        <p class="update-text"><i class="fas fa-bullhorn"></i> RRB Group D deadline extended</p>
+      </div>
+    </section>
+
+    <div class="main-content-grid">
+      <div class="left-column">
+        
+        <section class="section upcoming-exams-section">
+          <h2>Upcoming Exams</h2>
+          <div class="exam-cards">
+            <div class="exam-card civil-services">
+              <h3>UBPC Civil Services</h3>
+              <p>2025-05-31 <span class="tag green">Gold tier</span></p>
+            </div>
+            <div class="exam-card ssc-cgl">
+              <h3>SSC CGL</h3>
+              <p>2025-05-31 <span class="tag bright-green">Applied</span> <span class="tag small-tag green-tag">New</span></p>
+            </div>
+            <div class="exam-card ibps-po">
+              <h3>IBPS PO</h3>
+              <p>2025-06-31 <span class="tag orange">Step Fast</span></p>
+            </div>
+            <div class="exam-card civil-services">
+              <h3>Mock Exam</h3>
+              <p>2025-06-31 <span class="tag green">Free</span></p>
+            </div>
+          </div>
+        </section>
+        
+        <section class="section ai-tools-section">
+          <h2>AI Tools Section</h2>
+          <div class="ai-grid">
+            
+            <div class="upload-box">
+              <i class="fas fa-cloud-upload-alt upload-icon"></i>
+              <p class="upload-text">Upload or drop Dtp</p>
+              <div class="upload-options">
+                <p class="option-text">Regisretion: 554-4331</p>
+                <p class="option-text">ID_assecrt: Seerret</p>
+              </div>
+              <button class="apply-now-btn">Apply now</button>
+            </div>
+            
+            <div class="ai-tool-card gemini-tool-card">
+              <div class="image-placeholder gemini-placeholder"><i class="fas fa-brain"></i></div>
+              <div>
+                <h3>Gemini AI Syllabus Matcher</h3>
+                <p class="tool-desc">Upload your profile/exam details, and Gemini will instantly compare and recommend the best-fit Sarkari jobs. **Powered by Google Gemini**.</p>
+                <p class="tool-time">Last Used: 2025-10-17</p>
+                <button class="gemini-action-btn" onclick="showModal()">Run Analysis / Chat</button>
+              </div>
+            </div>
+            
+          </div>
+        </section>
+        
+        <section class="section applications-section">
+          <h2>My Applications</h2>
+          <div class="applications-grid">
+            
+            <div class="app-card">
+              <div class="card-header">
+                <i class="fas fa-briefcase card-icon"></i>
+                <h3>Job Title: Tech Officer</h3>
+              </div>
+              <div class="app-details">
+                <p>Eligibility: B.Tech, 2 yrs Exp</p>
+                <p>Syblinees: Maths, English, GK</p>
+                <p>Pay Scale: 50,000 - 80,000</p>
+                <p><strong>Last Date: 2025-07-15</strong></p>
+              </div>
+              <div class="app-actions">
+                <a href="#" class="syllabus-link">Syllabuss</a>
+                <a href="#" class="status-link">Status</a>
+                <button class="save-btn">Save Job</button>
+              </div>
+            </div>
+            
+            <div class="app-card">
+              <div class="card-header">
+                <i class="fas fa-briefcase card-icon"></i>
+                <h3>Job Title: Banking Clerk</h3>
+              </div>
+              <div class="app-details">
+                <p>Eligibility: Degree, Computer Cert</p>
+                <p>Syblinees: Banking, Quant, Reasoning</p>
+                <p>Pay Scale: 30,000 - 45,000</p>
+                <p><strong>Last Date: 2025-06-28</strong></p>
+              </div>
+              <div class="app-actions">
+                <a href="#" class="syllabus-link">Syllabuss</a>
+                <a href="#" class="status-link">Status</a>
+                <button class="save-btn">Save Job</button>
+              </div>
+            </div>
+            
+            <div class="app-card">
+              <div class="card-header">
+                <i class="fas fa-briefcase card-icon"></i>
+                <h3>Job Title: Railway Guard</h3>
+              </div>
+              <div class="app-details">
+                <p>Eligibility: 12th Pass</p>
+                <p>Syblinees: General Science, History</p>
+                <p>Pay Scale: 40,000 - 60,000</p>
+                <p><strong>Last Date: 2025-08-01</strong></p>
+              </div>
+              <div class="app-actions">
+                <a href="#" class="syllabus-link">Syllabuss</a>
+                <a href="#" class="status-link">Status</a>
+                <button class="save-btn">Save Job</button>
+              </div>
+            </div>
+            
+            <div class="app-card">
+              <div class="card-header">
+                <i class="fas fa-briefcase card-icon"></i>
+                <h3>Job Title: State PSC</h3>
+              </div>
+              <div class="app-details">
+                <p>Eligibility: Any Degree</p>
+                <p>Syblinees: State GK, Policy</p>
+                <p>Pay Scale: 60,000 - 1,20,000</p>
+              </div>
+              <div class="app-actions">
+                <a href="#" class="syllabus-link">Syllabuss</a>
+                <a href="#" class="status-link">Status</a>
+                <button class="apply-btn">Apply Job</button>
+              </div>
+            </div>
+            
+            <div class="app-card small-card form-submitted">
+              <h3>Job Title</h3>
+              <p><strong>Form Submitted</strong></p>
+              <button class="status-btn submitted-status">Savecont</button>
+            </div>
+            
+            <div class="app-card small-card date-applied">
+              <h3>Diem Applied</h3>
+              <p><strong>Date Applied</strong></p>
+              <button class="status-btn save-dark">Save Dark</button>
+            </div>
+            
+            <div class="app-card small-card form-sappled">
+              <h3>Job Title</h3>
+              <p><strong>Form Sappled</strong></p>
+              <button class="status-btn saved-status">Unknown</button>
+            </div>
+            
+            <div class="app-card small-card form-submitted-final">
+              <h3>Strpm Sbmitted</h3>
+              <p><strong>Form Submitded</strong></p>
+              <button class="status-btn apply-dark">Apply now</button>
+            </div>
+            
+          </div>
+        </section>
+        
+        <section class="section resources-section">
+          <h2>Quick Links</h2>
+          <div class="resources-links">
+            <a href="#">Syllabus Hub</a>
+            <a href="#">Previous Year Papers</a>
+            <a href="#">Contact Support</a>
+            <a href="#">Terms & Conditions</a>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Interview Guides</a>
+          </div>
+        </section>
+
+      </div>
+      
+      <div class="right-column">
+        <section class="section documents-manager-section">
+          <h2>My Documents Manager</h2>
+          
+          <div class="tool-cards-grid">
+            <div class="tool-card-box">
+              <i class="fas fa-file-alt card-icon blue-bg"></i>
+              <h3>AI Form Filler</h3>
+            </div>
+            <div class="tool-card-box">
+              <i class="fas fa-images card-icon orange-bg"></i>
+              <h3>Auto Image Resizer</h3>
+            </div>
+            <div class="tool-card-box">
+              <i class="fas fa-clipboard-check card-icon red-bg"></i>
+              <h3>Eligibility Checker</h3>
+            </div>
+          </div>
+
+          <div class="tool-details-grid">
+            <div class="detail-box">
+              <p>Preperted dre awod fill-drocanth ise-psont-any basbebt.</p>
+              <p class="time-stamp">Time here: 3724:00:81</p>
+            </div>
+            <div class="detail-box">
+              <p>Umbop dte docuta Goswt losr-psont-any basbebt.</p>
+              <p class="time-stamp">Stand here: 3724:00:81</p>
+            </div>
+            <div class="detail-box">
+              <p>Focl vlicne Duacrt loa fill-drocanth</p>
+              <p class="time-stamp">Iloone here: 3224:88:81</p>
+            </div>
+          </div>
+          
+          <div class="required-docs">
+            <h3>Required Docs for Current Form</h3>
+            <div class="doc-item">
+              <div>
+                <p>Passport Photo (100x120 px)</p>
+                <p class="doc-size">(504.20 pk)</p>
+              </div>
+              <div class="doc-status-indicators">
+                <div class="status-legend"><span class="legend-dot green"></span>Uploaded</div>
+                <div class="status-legend"><span class="legend-dot blue"></span>Missing</div>
+                <div class="status-legend"><span class="legend-dot red"></span>Mistog</div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <!-- CHATBOT WIDGET - Now triggers the AI modal -->
+  <a href="#" class="chatbot-widget" onclick="showModal(); return false;">
+    <div class="chat-icon">
+      <i class="fas fa-comment-dots"></i>
+    </div>
+    <div class="chat-text">
+      <p>Ask Sarkar**AI** —</p>
+      <p>Powered by **Gemini**</p>
+    </div>
+  </a>
+
+  <footer class="footer-section">
+    <div class="socials">
+      <a href="#"><i class="fab fa-twitter"></i></a>
+      <a href="#"><i class="fab fa-linkedin"></i></a>
+      <a href="#" class="download-app-btn">Download App (Coming Soon)</a>
+    </div>
+  </footer>
+
+  <!-- GEMINI AI ASSISTANT MODAL START -->
+    <div id="ai-modal" class="modal-container fixed inset-0 bg-black bg-opacity-70 z-50 flex justify-center items-center opacity-0 invisible" onclick="closeModal(event, true)">
+
+        <div class="bg-gray-800 rounded-xl shadow-3xl w-11/12 md:w-3/4 lg:w-1/2 p-6 md:p-8 transform transition-all duration-300" onclick="event.stopPropagation()">
+            <!-- Modal Header -->
+            <div class="flex justify-between items-center border-b border-gray-700 pb-4 mb-4">
+                <h2 class="text-2xl font-semibold text-white">Gemini Assistant</h2>
+                <button onclick="closeModal(event)" class="text-gray-400 hover:text-white transition duration-150">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <!-- AI Output Area -->
+            <div id="result-area" class="h-64 overflow-y-auto bg-gray-900 p-4 rounded-lg mb-4 border border-gray-700">
+                <p id="ai-response-text" class="text-gray-300">Hello! I am the Gemini AI Assistant. How can I help you today? I can help you find information about exams, eligibility, and government job processes.</p>
+                <div id="citations-area" class="mt-4 border-t border-gray-700 pt-3 hidden">
+                    <p class="text-xs font-semibold text-gray-500 mb-2">Sources Grounded by Google Search:</p>
+                    <ul id="citation-list" class="space-y-1">
+                        <!-- Citations will be injected here -->
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Loading Indicator -->
+            <div id="loading-indicator" class="hidden text-center py-4">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+                <p class="text-blue-400 mt-2">Thinking...</p>
+            </div>
+
+            <!-- User Input -->
+            <div class="flex space-x-2">
+                <input type="text" id="user-query-input" placeholder="Ask a question about government jobs or forms..."
+                       class="flex-1 p-3 rounded-lg bg-gray-900 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                       onkeydown="if(event.key === 'Enter') document.getElementById('ask-btn').click();">
+                <button id="ask-btn" onclick="askAI()" disabled
+                        class="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg shadow-md hover:bg-blue-700 disabled:bg-blue-800 disabled:text-gray-400 transition duration-150 ease-in-out">
+                    Ask
+                </button>
+            </div>
+            <p id="error-message" class="text-red-400 text-sm mt-2 hidden"></p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        // --- FIREBASE SETUP BOILERPLATE (MANDATORY) ---
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        let db, auth, app;
+
+        if (firebaseConfig) {
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+
+            if (initialAuthToken) {
+                signInWithCustomToken(auth, initialAuthToken).catch(console.error);
+            } else {
+                signInAnonymously(auth).catch(console.error);
+            }
+        }
+        // --- END FIREBASE SETUP ---
+        
+        // Global Constants
+        const API_KEY = ""; 
+        const MODEL_NAME = "gemini-2.5-flash-preview-09-2025";
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${API_KEY}`;
+        const MAX_RETRIES = 5;
+        const INITIAL_BACKOFF_MS = 1000;
+        const SYSTEM_INSTRUCTION = "You are the SarkarAI Assistant, an expert in government job recruitment, eligibility criteria, exam patterns, and form filling processes in India. Your responses must be professional, factual, and based on real-time data from Google Search. Provide concise, clear, and direct answers to the user's queries about sarkari jobs and processes.";
+
+        // UI Elements
+        const modal = document.getElementById('ai-modal');
+        const input = document.getElementById('user-query-input');
+        const askButton = document.getElementById('ask-btn');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const responseText = document.getElementById('ai-response-text');
+        const citationsArea = document.getElementById('citations-area');
+        const citationList = document.getElementById('citation-list');
+        const errorMessage = document.getElementById('error-message');
+        const resultArea = document.getElementById('result-area');
+
+        // Initial setup for button state
+        input.oninput = () => {
+            askButton.disabled = input.value.trim() === '';
+        };
+
+        window.showModal = () => {
+            modal.classList.remove('invisible', 'opacity-0');
+            modal.classList.add('visible', 'opacity-100');
+            input.focus();
+        };
+
+        window.closeModal = (event, isOverlayClick = false) => {
+            if (isOverlayClick || event.target === modal || event.target.closest('button')) {
+                modal.classList.remove('visible', 'opacity-100');
+                modal.classList.add('invisible', 'opacity-0');
+                // Clear state on close
+                responseText.textContent = 'Hello! I am the Gemini AI Assistant. How can I help you today? I can help you find information about exams, eligibility, and government job processes.';
+                citationList.innerHTML = '';
+                citationsArea.classList.add('hidden');
+                errorMessage.classList.add('hidden');
+                resultArea.scrollTop = 0;
+            }
+        };
+
+        /**
+         * Robust fetch call with exponential backoff for retries.
+         * @param {string} url - The API URL.
+         * @param {object} options - Fetch options (method, headers, body).
+         * @returns {Promise<Response>}
+         */
+        const exponentialBackoffFetch = async (url, options) => {
+            let lastResponse = null;
+            for (let i = 0; i < MAX_RETRIES; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    lastResponse = response;
+                    if (response.ok) {
+                        return response;
+                    }
+
+                    // Handle rate limiting (429) or transient errors (500, 503)
+                    if (response.status === 429 || response.status >= 500) {
+                        const delay = INITIAL_BACKOFF_MS * Math.pow(2, i);
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        continue; // Retry
+                    }
+                    // For client errors (4xx) that are not 429, don't retry, just break
+                    const errorJson = await response.json().catch(() => ({}));
+                    const errorMessageDetail = errorJson.error?.message || response.statusText;
+                    throw new Error(`API call failed with status ${response.status}: ${errorMessageDetail}`);
+                } catch (error) {
+                    if (i === MAX_RETRIES - 1) {
+                        // Max retries reached
+                        throw new Error(`Failed to fetch after ${MAX_RETRIES} attempts. Last attempt failed with: ${error.message}`);
+                    }
+                    // If it's a network error (like CORS or connection issue), retry with backoff
+                    const delay = INITIAL_BACKOFF_MS * Math.pow(2, i);
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    // Continue loop for retry
+                }
+            }
+            throw new Error(`API call failed after ${MAX_RETRIES} retries. Last response status: ${lastResponse?.status || 'N/A'}`);
+        };
+
+
+        window.askAI = async () => {
+            const userQuery = input.value.trim();
+            if (!userQuery) return;
+
+            // 1. Set UI to Loading State
+            askButton.disabled = true;
+            input.disabled = true;
+            loadingIndicator.classList.remove('hidden');
+            errorMessage.classList.add('hidden');
+            responseText.textContent = '';
+            citationList.innerHTML = '';
+            citationsArea.classList.add('hidden');
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                tools: [{ google_search: {} }], // Enable Google Search grounding
+                systemInstruction: {
+                    parts: [{ text: SYSTEM_INSTRUCTION }]
+                },
+            };
+
+            try {
+                // 2. Perform API Call with Backoff
+                const response = await exponentialBackoffFetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await response.json();
+                const candidate = result.candidates?.[0];
+
+                if (candidate && candidate.content?.parts?.[0]?.text) {
+                    // 3. Extract and display generated text
+                    const text = candidate.content.parts[0].text;
+                    responseText.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // Basic Markdown conversion for bolding
+
+                    // 4. Extract and display citations
+                    let sources = [];
+                    const groundingMetadata = candidate.groundingMetadata;
+                    if (groundingMetadata && groundingMetadata.groundingAttributions) {
+                        sources = groundingMetadata.groundingAttributions
+                            .map(attribution => ({
+                                uri: attribution.web?.uri,
+                                title: attribution.web?.title,
+                            }))
+                            .filter(source => source.uri && source.title);
+                    }
+
+                    if (sources.length > 0) {
+                        citationsArea.classList.remove('hidden');
+                        sources.forEach((source, index) => {
+                            const li = document.createElement('li');
+                            li.innerHTML = `
+                                <a href="${source.uri}" target="_blank" rel="noopener noreferrer" class="citation-link block p-2 rounded-md hover:bg-gray-700 text-sm text-blue-400">
+                                    <span class="text-gray-500 mr-2">[${index + 1}]</span> ${source.title}
+                                </a>
+                            `;
+                            citationList.appendChild(li);
+                        });
+                    } else {
+                        citationsArea.classList.add('hidden');
+                    }
+                } else {
+                    // Handle case where API call succeeded but returned no content
+                    responseText.textContent = "I'm sorry, I couldn't generate a relevant response for that query. Please try phrasing your question differently.";
+                }
+
+            } catch (error) {
+                // 5. Handle Errors
+                console.error("Gemini API Error:", error);
+                errorMessage.textContent = `Error: ${error.message}. Please check your API Key or try again later.`;
+                errorMessage.classList.remove('hidden');
+                responseText.textContent = "There was an issue contacting the AI service. Please see the error message below or check the console for details.";
+                citationsArea.classList.add('hidden');
+            } finally {
+                // 6. Reset UI
+                loadingIndicator.classList.add('hidden');
+                input.disabled = false;
+                input.value = '';
+                askButton.disabled = true; // Button disabled until new text is entered
+                resultArea.scrollTop = resultArea.scrollHeight; // Scroll to bottom
+            }
+        };
+    </script>
+</body>
+</html>

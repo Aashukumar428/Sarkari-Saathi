@@ -1,0 +1,23 @@
+{
+  "name": "sarkari-saathi",
+  "version": "1.0.0",
+  "description": "Sarkari Saathi - A portal for government job updates and form assistance.",
+  "main": "server/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "nodemon server/server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "firebase": "^10.13.1",
+    "nodemailer": "^6.9.13"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  },
+  "author": "Aashu Gupta",
+  "license": "MIT"
+}
